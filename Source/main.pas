@@ -5,18 +5,17 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   ComCtrls, Menus, ToolWin, Globals, StdCtrls, ExtCtrls, ImgList, Buttons,
-  SensiControls, URL
-  {$IFDEF ARPLUS_AD}, CTError, CTMgmt, CTPush, CTTypes, CTUtils, GenericFunctions {$ENDIF};
+  System.ImageList, URL, SensiCtrls;
 
 type
   TfrmMain = class(TForm)
     MainMenu1: TMainMenu;
     TheStatusBar: TStatusBar;
-    File1: TMenuItem;
-    mnuView: TMenuItem;
-    Tools1: TMenuItem;
+    FileMenu: TMenuItem;
+    ViewMenu: TMenuItem;
+    HelpMenu: TMenuItem;
     SmallImages: TImageList;
-    mnuKey: TMenuItem;
+    AddRemoveMenu: TMenuItem;
     cmdKeyEdit: TMenuItem;
     N1: TMenuItem;
     cmdKeyUninstall: TMenuItem;
@@ -64,11 +63,9 @@ type
     Bevel4: TBevel;
     panMenuRefresh: TSensitivePanel;
     cmdViewLeftMenu: TMenuItem;
-    LH2: TMenuItem;
     cmdHelpTopics: TMenuItem;
     TheAdvice: TMemo;
     LH1: TMenuItem;
-    cmdHelpPurchase: TMenuItem;
     LH3: TMenuItem;
     cmdHelpAurelitec: TMenuItem;
     cmdHelpAurelitecHome: TMenuItem;
@@ -78,21 +75,9 @@ type
     urlHome: TURL;
     urlProducts: TURL;
     urlArplus: TURL;
-    ActivityTimer: TTimer;
-    panTop: TPanel;
-    PaintBox1: TPaintBox;
-    imgadarea1: TPanel;
-    imgAdarea2: TPanel;
-    imgAdarea3: TPanel;
-    panBottom: TPanel;
-    PaintBox2: TPaintBox;
-    imgAdarea4: TPanel;
-    imgAdarea5: TPanel;
-    imgAdarea6: TPanel;
-    imgAdarea7: TPanel;
     procedure FormCreate(Sender: TObject);
     procedure cmdKeyEditClick(Sender: TObject);
-    procedure mnuKeyClick(Sender: TObject);
+    procedure AddRemoveMenuClick(Sender: TObject);
     procedure cmdKeyNewClick(Sender: TObject);
     procedure cmdKeyUninstallClick(Sender: TObject);
     procedure cmdKeyDeleteClick(Sender: TObject);
@@ -120,35 +105,9 @@ type
     procedure TheAdviceEnter(Sender: TObject);
     procedure TheListViewChange(Sender: TObject; Item: TListItem;
       Change: TItemChange);
-    procedure cmdHelpPurchaseClick(Sender: TObject);
     procedure cmdHelpAurelitecHomeClick(Sender: TObject);
     procedure cmdHelpAurelitecProductsClick(Sender: TObject);
     procedure cmdHelpAurelitecArplusClick(Sender: TObject);
-    procedure Tools1Click(Sender: TObject);
-    procedure FormPaint(Sender: TObject);
-    procedure ActivityTimerTimer(Sender: TObject);
-    procedure imgAdarea1Click(Sender: TObject);
-    procedure imgAdarea1MouseMove(Sender: TObject; Shift: TShiftState; X,
-      Y: Integer);
-    procedure imgAdarea3Click(Sender: TObject);
-    procedure imgAdarea3MouseMove(Sender: TObject; Shift: TShiftState; X,
-      Y: Integer);
-    procedure imgAdarea2Click(Sender: TObject);
-    procedure imgAdarea2MouseMove(Sender: TObject; Shift: TShiftState; X,
-      Y: Integer);
-    procedure imgAdarea4Click(Sender: TObject);
-    procedure imgAdarea4MouseMove(Sender: TObject; Shift: TShiftState; X,
-      Y: Integer);
-    procedure imgAdarea5Click(Sender: TObject);
-    procedure imgAdarea5MouseMove(Sender: TObject; Shift: TShiftState; X,
-      Y: Integer);
-    procedure imgAdarea6Click(Sender: TObject);
-    procedure imgAdarea6MouseMove(Sender: TObject; Shift: TShiftState; X,
-      Y: Integer);
-    procedure imgAdarea7Click(Sender: TObject);
-    procedure imgAdarea7MouseMove(Sender: TObject; Shift: TShiftState; X,
-      Y: Integer);
-    procedure FormResize(Sender: TObject);
   protected
     procedure WMDropFiles(var msg : TMessage); message WM_DROPFILES;
   private
@@ -169,7 +128,7 @@ implementation
 uses Registry, Clipbrd, EditProgram, ShellFiles, AddProgram,
   UninstallKeyTools, FormAbout, VCLToolsPlus, ShellAPI,
   uShortCut, FileInfoUtils, FileUtils, FormOptions, configuration,
-  FormUninstall, VCLRegSavers, AddRemoveTools, FormOrder, FormDeleteKey;
+  FormUninstall, VCLRegSavers, AddRemoveTools, FormDeleteKey;
 
 procedure TfrmMain.LoadEntries(const TheEntry : string);
 var
@@ -199,7 +158,7 @@ begin
   with Reg do
   try
     RootKey := HKEY_LOCAL_MACHINE;
-    if OpenKey(sUninstallSection, False) then
+    if OpenKeyReadOnly(sUninstallSection) then
     begin
       Keys := TStringList.Create;
       try
@@ -208,7 +167,7 @@ begin
         for I := 0 to Keys.Count - 1 do
         begin
           CloseKey;
-          if OpenKey(sUninstallSection + '\' + Keys.Strings[I], False) then
+          if OpenKeyReadOnly(sUninstallSection + '\' + Keys.Strings[I]) then
           begin
             if ValueExists(sDisplayName) and ValueExists(sUninstallString) then
             with TheListView.Items.Add do
@@ -275,7 +234,7 @@ end;
 (* The Add/Remove Menu                                               *)
 (*********************************************************************)
 
-procedure TfrmMain.mnuKeyClick(Sender: TObject);
+procedure TfrmMain.AddRemoveMenuClick(Sender: TObject);
 var
   AnyKey : Boolean;
 begin
@@ -313,6 +272,7 @@ begin
   if TheListView.SelCount <= 0 then Exit;
   TheKey := TheListView.Selected.SubItems[1];
 
+  DeleteKeyBoxNameInAdvice := TheListView.Selected.Caption;
   with TDeleteKeyBox.Create(Self) do
   try
     ShowModal;
@@ -431,7 +391,7 @@ var
 begin
   I := (Sender as TComponent).Tag;
   TheListView.ViewStyle := TViewStyle(I);
-  mnuView.Items[I + 3].Checked := True;
+  ViewMenu.Items[I + 3].Checked := True;
 end;
 
 procedure TfrmMain.cmdViewRefreshClick(Sender: TObject);
@@ -451,11 +411,6 @@ end;
 procedure TfrmMain.cmdHelpTopicsClick(Sender: TObject);
 begin
   Application.HelpCommand(HELP_FINDER, 0);
-end;
-
-procedure TfrmMain.cmdHelpPurchaseClick(Sender: TObject);
-begin
-  with TOrderBox.Create(Self) do try ShowModal; finally Free; end;
 end;
 
 procedure TfrmMain.cmdHelpAurelitecHomeClick(Sender: TObject);
@@ -572,23 +527,6 @@ end;
 
 procedure TfrmMain.FormCreate(Sender: TObject);
 begin
-  {$IFDEF ARPLUS_AD}
-
-  { initialize the ad system }
-  if CT_InitAdSystem () then
-  begin
-    ActivityTimer.Enabled := true;
-    ActivityTimer.Interval := 50;
-
-    { Initialize Ad Areas }
-    CT_InitAdSpace();
-  end;
-
-  {$ELSE}
-  panTop.Visible := False;
-  panBottom.Visible := False;
-  {$ENDIF}
-
   try
     Application.OnHint := ShowHint;       { hint event-handler }
     Application.HelpFile := ExtractFilePath(Application.ExeName) + 'ARPLUS.HLP';
@@ -609,12 +547,6 @@ end;
 
 procedure TfrmMain.FormDestroy(Sender: TObject);
 begin
-  { shut down the ad system if the application is exiting }
-  {$IFDEF ARPLUS_AD}
-  CT_ShutdownAdSystem ();
-  ActivityTimer.Enabled := false;
-  {$ENDIF}
-
   try
     SaveWindowState(Self, REG_AppRoot, REG_optDesk); { save window state and position }
     if WindowState = wsNormal then SaveControlPlacement(Self, REG_AppRoot, REG_optDesk);
@@ -633,7 +565,7 @@ begin
   cmdViewLeftMenu.Checked := optDeskShowLeftMenu.Bool;
   panLeftMenu.Visible := optDeskShowLeftMenu.Bool;
 
-  mnuView.Items[3 + optDeskViewStyle.Int].Checked := True;
+  ViewMenu.Items[3 + optDeskViewStyle.Int].Checked := True;
   TheListView.ViewStyle := TViewStyle(optDeskViewStyle.Int);
 
   { Hints }
@@ -672,217 +604,6 @@ end;
 procedure TfrmMain.TheAdviceEnter(Sender: TObject);
 begin
   try TheListView.SetFocus; except end;
-end;
-
-procedure TfrmMain.Tools1Click(Sender: TObject);
-begin
-  {$IFNDEF ARPLUS_AD}
-  cmdHelpPurchase.Visible := False; LH1.Visible := False;
-  {$ENDIF}
-end;
-
-(***********************************************************************)
-(* CONDUCENT                                                           *)
-(***********************************************************************)
-
-procedure TfrmMain.imgAdarea1Click(Sender: TObject);
-begin
-  {$IFDEF ARPLUS_AD}
-  imgAdarea1.Cursor := crHourglass;
-  if (t_Banner.adLoc <> CT_NOHANDLE) then
-    CT_MgmtALClick(t_Banner.adLoc);
-  imgAdarea1.Cursor := crHandpoint;
-  {$ENDIF}
-end;
-
-procedure TfrmMain.imgAdarea1MouseMove(Sender: TObject; Shift: TShiftState;
-  X, Y: Integer);
-begin
-  {$IFDEF ARPLUS_AD}
-  imgAdarea1.Cursor := crHandpoint;
-  {$ENDIF}
-end;
-
-procedure TfrmMain.imgAdarea3Click(Sender: TObject);
-begin
-  {$IFDEF ARPLUS_AD}
-  imgAdarea3.Cursor := crHourglass;
-  if (t_Button1.adLoc <> CT_NOHANDLE) then
-    CT_MgmtALClick(t_Button1.adLoc);
-  imgAdarea3.Cursor := crHandpoint;
-  {$ENDIF}
-end;
-
-procedure TfrmMain.imgAdarea3MouseMove(Sender: TObject; Shift: TShiftState;
-  X, Y: Integer);
-begin
-  {$IFDEF ARPLUS_AD}
-  imgAdarea2.Cursor := crHandpoint;
-  {$ENDIF}
-end;
-
-procedure TfrmMain.imgAdarea2Click(Sender: TObject);
-begin
-  {$IFDEF ARPLUS_AD}
-  imgAdarea2.Cursor := crHourglass;
-  if (t_Button2.adLoc <> CT_NOHANDLE) then
-    CT_MgmtALClick(t_Button2.adLoc);
-  imgAdarea2.Cursor := crHandpoint;
-  {$ENDIF}
-end;
-
-procedure TfrmMain.imgAdarea2MouseMove(Sender: TObject; Shift: TShiftState;
-  X, Y: Integer);
-begin
-  {$IFDEF ARPLUS_AD}
-  imgAdarea3.Cursor := crHandpoint;
-  {$ENDIF}
-end;
-
-procedure TfrmMain.imgAdarea4Click(Sender: TObject);
-begin
-  {$IFDEF ARPLUS_AD}
-  imgAdarea4.Cursor := crHourglass;
-  if (t_MButton1.adLoc <> CT_NOHANDLE) then
-    CT_MgmtALClick(t_MButton1.adLoc);
-  imgAdarea4.Cursor := crHandpoint;
-  {$ENDIF}
-end;
-
-procedure TfrmMain.imgAdarea4MouseMove(Sender: TObject; Shift: TShiftState;
-  X, Y: Integer);
-begin
-  {$IFDEF ARPLUS_AD}
-  imgAdarea4.Cursor := crHandpoint;
-  {$ENDIF}
-end;
-
-procedure TfrmMain.imgAdarea5Click(Sender: TObject);
-begin
-  {$IFDEF ARPLUS_AD}
-  imgAdarea5.Cursor := crHourglass;
-  if (t_MButton2.adLoc <> CT_NOHANDLE) then
-    CT_MgmtALClick(t_MButton2.adLoc);
-  imgAdarea5.Cursor := crHandpoint;
-  {$ENDIF}
-end;
-
-procedure TfrmMain.imgAdarea5MouseMove(Sender: TObject; Shift: TShiftState;
-  X, Y: Integer);
-begin
-  {$IFDEF ARPLUS_AD}
-  imgAdarea5.Cursor := crHandpoint;
-  {$ENDIF}
-end;
-
-procedure TfrmMain.imgAdarea6Click(Sender: TObject);
-begin
-  {$IFDEF ARPLUS_AD}
-   imgAdarea6.Cursor := crHourglass;
-   if (t_MButton3.adLoc <> CT_NOHANDLE) then
-     CT_MgmtALClick(t_MButton3.adLoc);
-   imgAdarea6.Cursor := crHandpoint;
-   {$ENDIF}
-end;
-
-procedure TfrmMain.imgAdarea6MouseMove(Sender: TObject; Shift: TShiftState;
-  X, Y: Integer);
-begin
-  {$IFDEF ARPLUS_AD}
-  imgAdarea6.Cursor := crHandpoint;
-  {$ENDIF}
-end;
-
-procedure TfrmMain.imgAdarea7Click(Sender: TObject);
-begin
-  {$IFDEF ARPLUS_AD}
-   imgAdarea7.Cursor := crHourglass;
-   if (t_MButton4.adLoc <> CT_NOHANDLE) then
-     CT_MgmtALClick(t_MButton4.adLoc);
-   imgAdarea7.Cursor := crHandpoint;
-   {$ENDIF}
-end;
-
-procedure TfrmMain.imgAdarea7MouseMove(Sender: TObject; Shift: TShiftState;
-  X, Y: Integer);
-begin
-  {$IFDEF ARPLUS_AD}
-  imgAdarea7.Cursor := crHandpoint;
-  {$ENDIF}
-end;
-
-procedure TfrmMain.FormResize(Sender: TObject);
-{$IFDEF ARPLUS_AD}
-var
-  BannerWidth, BannerHeight  : Integer;
-  ButtonWidth : Integer;
-  MicroButtonWidth, MicroButtonHeight : Integer;
-  EquiDistBottom, EquiDistTop : Integer;
-  MinFrmHeight, MinFrmWidth : Integer;
-{$ENDIF}
-begin
-{$IFDEF ARPLUS_AD}
-    BannerWidth       := 468;
-    BannerHeight      := 60;
-    ButtonWidth       := 55;
-    MicroButtonWidth  := 88;
-    MicroButtonHeight := 31;
-    EquiDistBottom    := 60;
-    EquiDistTop       := 18;
-    MinFrmHeight      := BannerHeight + MicroButtonHeight + 72;
-    MinFrmWidth       := BannerWidth + ButtonWidth + 80;
-
-    if (frmMain.Width < MinFrmWidth) then
-        frmMain.Width := MinFrmWidth;
-
-    if (frmMain.Height < MinFrmHeight) then
-    begin
-      frmMain.Height := MinFrmHeight;
-      frmMain.panClient.Visible := false;
-    end
-    else
-      frmMain.panClient.Visible := true;
-
-    if (frmMain.Width >= MinFrmWidth) then
-    begin
-      imgAdArea1.Left  := (frmMain.Width - (BannerWidth + ButtonWidth +
-                         EquiDistTop)) div 2;
-      imgAdArea2.Left := imgAdArea1.Left + BannerWidth + EquiDistTop;
-      imgAdArea3.Left := imgAdArea2.Left;
-
-      imgAdArea4.Left := (frmMain.Width - ((MicroButtonWidth * 4) +
-                         (EquiDistBottom * 3))) div 2;
-      imgAdArea5.Left := imgAdArea4.Left + MicroButtonWidth +
-                         EquiDistBottom;
-      imgAdArea6.Left := imgAdArea5.Left + MicroButtonWidth +
-                         EquiDistBottom;
-      imgAdArea7.Left := imgAdArea6.Left + MicroButtonWidth +
-                         EquiDistBottom;
-    end;
-{$ENDIF}
-end;
-
-{----------------- Delphisample3 Application initialization ----------------- }
-
-procedure TfrmMain.FormPaint(Sender: TObject);
-begin
-  {$IFDEF ARPLUS_AD}
-  frmMain.Update;
-  CT_DrawAd(@t_Banner);
-  CT_DrawAd(@t_Button1);
-  CT_DrawAd(@t_Button2);
-  CT_DrawAd(@t_MButton1);
-  CT_DrawAd(@t_MButton2);
-  CT_DrawAd(@t_MButton3);
-  CT_DrawAd(@t_MButton4);
-  {$ENDIF}
-end;
-
-procedure TfrmMain.ActivityTimerTimer(Sender: TObject);
-begin
-  {$IFDEF ARPLUS_AD}
-  CT_AdProgress ();
-  {$ENDIF}
 end;
 
 end.

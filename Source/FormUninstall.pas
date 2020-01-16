@@ -89,7 +89,7 @@ begin
   Image1.Visible := False;
   ThePages.PageIndex := 1;
   TheBevel.Visible := False; cmdCancel.Visible := False;
-  if WinExec(PChar(uninstCommand), SW_SHOWNORMAL) <= 31 then
+  if WinExec(PAnsiChar(uninstCommand), SW_SHOWNORMAL) <= 31 then
   begin
     Application.MessageBox(PChar(sExecError), PChar(uninstCommand), MB_ICONERROR);
     cmdDone.OnClick(Self);

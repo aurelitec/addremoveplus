@@ -2,9 +2,7 @@ unit FormDeleteKey;
 
 interface
 
-uses
-  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ExtCtrls;
+uses Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs, StdCtrls, ExtCtrls;
 
 type
   TDeleteKeyBox = class(TForm)
@@ -19,12 +17,13 @@ type
   private
     { Private declarations }
   public
-    DeleteDecision : Integer;
+    DeleteDecision: Integer;
     { Public declarations }
   end;
 
-var
-  DeleteKeyBox: TDeleteKeyBox;
+var DeleteKeyBox: TDeleteKeyBox;
+
+var DeleteKeyBoxNameInAdvice: string;
 
 implementation
 
@@ -35,14 +34,15 @@ uses main, Globals, VCLToolsStd;
 procedure TDeleteKeyBox.FormCreate(Sender: TObject);
 begin
   DeleteDecision := 2; // cancel
-  ediAdvice.Text := Format(sConfirmKeyDeletion,
-    [frmMain.TheListView.Selected.Caption]);
+  ediAdvice.Text := Format(sConfirmKeyDeletion, [DeleteKeyBoxNameInAdvice]);
   CenterChildForm(Application.MainForm, Self);
 end;
 
 procedure TDeleteKeyBox.ediAdviceEnter(Sender: TObject);
 begin
-  try cmdCancel.SetFocus; except end;
+  try cmdCancel.SetFocus;
+  except
+  end;
 end;
 
 procedure TDeleteKeyBox.cmdUninstallClick(Sender: TObject);
