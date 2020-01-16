@@ -1,0 +1,78 @@
+
+Add/Remove Plus! Non-Sponsored (Registered) Edition
+Version 1.0
+
+Produced and distributed by
+Aurelitec Software Network
+http://www.aurelitec.com
+
+Copyright © 1998-1999 Aurelitec Development Group
+All rights reserved.
+
+___________________________________________________________________
+
+ SOFTWARE LICENSE AND WARRANTY DISCLAIMER
+___________________________________________________________________
+
+NOTICE: THIS IS A CONTRACT. BY INSTALLING AND USING THIS SOFTWARE,
+YOU ARE AGREEING TO BE BOUND BY ALL THE TERMS AND CONDITIONS OF THIS
+AGREEMENT. PLEASE READ CAREFULLY BEFORE PROCEEDING. IF YOU DO NOT
+AGREE TO THESE TERMS, PROMPTLY DESTROY ALL COPIES OF THE SOFTWARE IN
+YOUR POSSESSION.
+
+The Non-Sponsored Edition
+
+This non-sponsored edition of Add/Remove Plus! is for your personal
+use only. You may not distribute it to anyone. Violation of this
+rule may result in temporary or permanent revocation of this license;
+the original licensee will also be held responsible for damages,
+physical and estimated.
+
+One copy of the non-sponsored edition of Add/Remove Plus! may
+either be used by a single person who uses the software personally
+on one or more computers, or installed on a single workstation used
+nonsimultaneously by multiple people, but not both.
+
+You may access the non-sponsored edition of Add/Remove Plus! through
+a network, provided that you have obtained individual licenses for
+the software covering all workstations that will access the software
+through the network. For instance, if 4 different workstations will
+access Add/Remove Plus! on the network, each workstation must have
+its own Add/Remove Plus! license, regardless of whether they use
+Add/Remove Plus! at different times or concurrently. (Note:
+Site-License arrangements may be made by contacting Aurelitec)
+
+Copyright and Restrictions
+
+The Program is owned by Aurelitec and is protected by the Romanian
+and United States copyright laws and international treaty
+provisions. All rights not expressly granted are retained. None of
+the components of the software (including the documentation) may be
+copied, removed or altered, in whole or part, for any unauthorized
+use.
+
+Disclaimer of Warranty
+
+THIS SOFTWARE AND THE ACCOMPANYING FILES ARE SOLD "AS IS" AND
+WITHOUT WARRANTIES AS TO PERFORMANCE OR MERCHANTABILITY OR ANY OTHER
+WARRANTIES WHETHER EXPRESSED OR IMPLIED. Because of the various
+hardware and software environments into which Add/Remove Plus! may
+be put, NO WARRANTY OF FITNESS FOR A PARTICULAR PURPOSE IS OFFERED.
+
+Good data processing procedure dictates that any program be
+thoroughly tested with non-critical data before relying on it. The
+user must assume the entire risk of using the program. ANY LIABILITY
+OF THE SELLER WILL BE LIMITED EXCLUSIVELY TO PRODUCT REPLACEMENT OR
+REFUND OF PURCHASE PRICE.
+
+Jurisdiction, General Provisions
+
+This agreement shall be governed by the laws of Romania. Valid in
+all questions of law is the Romanian law and the Romanian
+jurisdiction. All users of this software agree to the Romanian law
+and the Romanian jurisdiction.
+
+Any action or proceeding brought by anyone arising out of or related
+to these terms and conditions shall be brought only in a court of
+competent jurisdiction located in Oradea, Romania, and the parties
+hereby consent to the jurisdiction and venue of said court.
